@@ -1,0 +1,51 @@
+from minio import Minio
+from minio.error import ResponseError
+import pandas as pd
+import os
+import json
+
+# Conectar-se ao MinIO
+minio_client = Minio('awari-minio-nginx:9000',
+                     access_key='axjFa9SYYq3UjH6O',
+                     secret_key='w0UxjfIQU8qFl9TlsfuosXMFvLY52VTA',
+                     secure=False)
+
+# Ler o arquivo JSON contendo dados dos municípios e estados
+with open('/municipios-estados/municipios.json', 'r') as file:
+    data = json.load(file)
+
+# Criar uma pasta para cada estado e salvar cidades.csv dentro dessa pasta
+for estado in data:
+    uf = estado['sigla']
+    cidades_df = pd.DataFrame(estado['municipios'])
+    pasta_uf = f'/tmp/{uf}'
+    os.makedirs(pasta_uf, exist_ok=True)
+    cidades_df.to_csv(os.path.join(pasta_uf, 'cidades.csv'), index=False)
+
+    # Enviar o arquivo para o MinIO
+    minio_client.fput_object('bucket_name', f'{uf}/cidades.csv', os.path.join(pasta_uf, 'cidades.csv'))
+
+# Importar os dados para o MongoDB
+from pymongo import MongoClient
+
+# Conectar-se ao MongoDB ('mongodb://username:password@host:port/database')
+client = MongoClient('mongodb://username:password@host:port/database')
+db = client['nome_do_banco']
+
+# Ler os arquivos CSV e inserir dados no MongoDB
+for estado in data:
+    uf = estado['sigla']
+    file_path = f'/tmp/{uf}/cidades.csv'
+    cidades_df = pd.read_csv(file_path)
+    
+    # Inserir dados no MongoDB
+    collection_name = f'{uf}_cidades'
+    db[collection_name].insert_many(cidades_df.to_dict(orient='records'))
+
+# Visualizar dados do MongoDB
+for estado in data:
+    uf = estado['sigla']
+    collection_name = f'{uf}_cidades'
+    cursor = db[collection_name].find()
+    for document in cursor:
+        print(document)
