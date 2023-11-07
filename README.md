@@ -21,42 +21,6 @@ Olá, seja bem vindo ao meu portifolio! Aqui, você vai encontrar códigos e arq
             justify-content: center;
             height: 100vh;
         }
-
-        .container {
-            background-color: #ffffff;
-            border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            color: #007bff;
-        }
-
-        h2 {
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            color: #343a40;
-        }
-
-        p {
-            font-size: 1em;
-            margin-bottom: 25px;
-        }
-
-        a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 
 <body>
